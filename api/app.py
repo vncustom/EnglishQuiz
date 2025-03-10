@@ -1,14 +1,16 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify
 import requests
 import json
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
-app = Flask(__name__)
-app.secret_key = os.urandom(24)  # For session management
+app = Flask(__name__, 
+    static_folder='../static',    # Update static folder path
+    template_folder='../templates' # Update templates folder path
+)
+app.secret_key = os.urandom(24)
 
 @app.route('/')
 def index():
