@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__, 
-    static_folder='../static',    # Update static folder path
-    template_folder='../templates' # Update templates folder path
+    static_folder='../static',
+    template_folder='../templates'
 )
 app.secret_key = os.urandom(24)
 
@@ -79,18 +79,18 @@ def generate_quiz():
                     'topP': 0.95,
                     'maxOutputTokens': 2048,
                 }
-            }
+            },
+            timeout=30
         )
         
         if not response.ok:
-            return jsonify({'error': 'Failed to generate quiz from Gemini API'}), response.status_code
+            error_data = response.json()
+            error_message = error_data.get('error', {}).get('message', 'Unknown error occurred')
+            return jsonify({'error': f'Gemini API error: {error_message}'}), response.status_code
         
         data = response.json()
-        
-        # Extract the JSON from the response
         text_content = data['candidates'][0]['content']['parts'][0]['text']
         
-        # Find the JSON object in the text
         import re
         json_match = re.search(r'({[\s\S]*})', text_content)
         
@@ -103,8 +103,12 @@ def generate_quiz():
         except json.JSONDecodeError:
             return jsonify({'error': 'Failed to parse quiz data from Gemini response'}), 500
             
+    except requests.Timeout:
+        return jsonify({'error': 'Request timed out. Please try again.'}), 504
+    except requests.RequestException as e:
+        return jsonify({'error': f'Network error: {str(e)}'}), 500
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'Unexpected error: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

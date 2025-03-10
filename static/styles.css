@@ -196,3 +196,17 @@ footer {
 footer p {
     margin-bottom: 0.5rem;
 }
+
+.error-message {
+    background-color: #fee2e2;
+    border: 1px solid #ef4444;
+    color: #dc2626;
+    padding: 0.75rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.error-container {
+    margin: 1rem 0;
+}

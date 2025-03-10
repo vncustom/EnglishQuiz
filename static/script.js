@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM elements
     const apiKeySection = document.getElementById('api-key-section');
     const quizFormSection = document.getElementById('quiz-form-section');
     const quizDisplaySection = document.getElementById('quiz-display-section');
@@ -26,12 +25,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const reviewContainer = document.getElementById('review-container');
     const newQuizBtn = document.getElementById('new-quiz');
     
-    // State
     let apiKey = localStorage.getItem('geminiApiKey') || '';
     let currentQuiz = null;
     let userAnswers = [];
     
-    // Initialize
     if (apiKey) {
         apiKeyInput.value = apiKey;
         showSection(quizFormSection);
@@ -39,13 +36,11 @@ document.addEventListener('DOMContentLoaded', function() {
         showSection(apiKeySection);
     }
     
-    // Event listeners
     submitApiKeyBtn.addEventListener('click', handleApiKeySubmit);
     generateQuizBtn.addEventListener('click', handleGenerateQuiz);
     submitQuizBtn.addEventListener('click', handleSubmitQuiz);
     newQuizBtn.addEventListener('click', handleNewQuiz);
     
-    // Functions
     function handleApiKeySubmit() {
         const key = apiKeyInput.value.trim();
         if (!key) {
@@ -82,18 +77,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
             });
             
+            const data = await response.json();
+            
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Failed to generate quiz');
+                throw new Error(data.error || 'Failed to generate quiz');
             }
             
-            currentQuiz = await response.json();
+            currentQuiz = data;
             userAnswers = new Array(currentQuiz.questions.length).fill('');
             
             displayQuiz(currentQuiz);
             showSection(quizDisplaySection);
         } catch (error) {
-            alert(error.message || 'An error occurred while generating the quiz');
+            const errorMessage = error.message || 'An error occurred while generating the quiz';
+            showError(errorMessage);
         } finally {
             showLoading(false);
         }
@@ -102,7 +99,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayQuiz(quiz) {
         quizTitle.textContent = quiz.title;
         
-        // Display passage if available
         if (quiz.passage && quiz.passage !== 'null') {
             passageText.textContent = quiz.passage;
             passageContainer.classList.remove('hidden');
@@ -110,7 +106,6 @@ document.addEventListener('DOMContentLoaded', function() {
             passageContainer.classList.add('hidden');
         }
         
-        // Display questions
         questionsContainer.innerHTML = '';
         quiz.questions.forEach((question, qIndex) => {
             const questionElement = document.createElement('div');
@@ -165,7 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const total = currentQuiz.questions.length;
         const percentage = Math.round((score / total) * 100);
         
-        // Display results
         scoreElement.textContent = score;
         totalElement.textContent = total;
         percentageElement.textContent = percentage;
@@ -178,10 +172,14 @@ document.addEventListener('DOMContentLoaded', function() {
             scoreMessage.textContent = 'Keep practicing!';
         }
         
-        // Display review
+        displayReview(currentQuiz, userAnswers, correctAnswers);
+        showSection(resultsSection);
+    }
+    
+    function displayReview(quiz, userAnswers, correctAnswers) {
         reviewContainer.innerHTML = '';
-        currentQuiz.questions.forEach((question, qIndex) => {
-            const isCorrect = userAnswers[qIndex] === question.correctAnswer;
+        quiz.questions.forEach((question, qIndex) => {
+            const isCorrect = userAnswers[qIndex] === correctAnswers[qIndex];
             
             const reviewElement = document.createElement('div');
             reviewElement.className = 'review-question';
@@ -195,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
             question.options.forEach(option => {
                 const optionElement = document.createElement('div');
                 const isUserAnswer = userAnswers[qIndex] === option;
-                const isCorrectAnswer = question.correctAnswer === option;
+                const isCorrectAnswer = correctAnswers[qIndex] === option;
                 
                 if (isUserAnswer && isCorrectAnswer) {
                     optionElement.className = 'review-option correct';
@@ -223,8 +221,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             reviewContainer.appendChild(reviewElement);
         });
-        
-        showSection(resultsSection);
     }
     
     function handleNewQuiz() {
@@ -250,5 +246,25 @@ document.addEventListener('DOMContentLoaded', function() {
             generateQuizBtn.classList.remove('hidden');
             loadingElement.classList.add('hidden');
         }
+    }
+    
+    function showError(message) {
+        const errorElement = document.createElement('div');
+        errorElement.className = 'error-message';
+        errorElement.textContent = message;
+        
+        const container = quizFormSection.querySelector('.error-container') || (() => {
+            const cont = document.createElement('div');
+            cont.className = 'error-container';
+            quizFormSection.insertBefore(cont, generateQuizBtn);
+            return cont;
+        })();
+        
+        container.innerHTML = '';
+        container.appendChild(errorElement);
+        
+        setTimeout(() => {
+            errorElement.remove();
+        }, 5000);
     }
 });
