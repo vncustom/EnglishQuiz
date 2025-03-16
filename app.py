@@ -25,7 +25,7 @@ TOPIC_SUGGESTIONS = {
         "intermediate": ["Culture", "Social Media", "Work Life", "Global Issues", "Science"],
         "upper-intermediate": ["Psychology", "Economics", "Politics", "Literature", "Innovation"],
         "advanced": ["Philosophy", "Ethics", "Globalization", "Climate Change", "Artificial Intelligence"]
-    }
+    },
     "vocabulary": {
         "beginner": ["Basic Adjectives (Colors, Sizes)", "Numbers and Time", "Family Members", "Everyday Objects", "Common Verbs (eat, go, see)"],
         "pre-intermediate": ["Travel and Transportation", "Jobs and Occupations", "Feelings and Emotions", "Shopping and Money", "Food and Cooking"],
