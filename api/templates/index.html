@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Bài Tập Tiếng Anh</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f8ff;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        .input-section {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        input, select, button {
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #bdc3c7;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 5px rgba(52,152,219,0.3);
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .quiz-container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .passage {
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            border-left: 4px solid #3498db;
+        }
+
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #eee;
+        }
+
+        .question label {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .question label:hover {
+            background-color: #ecf5ff;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #e8f5e9;
+            border-radius: 10px;
+        }
+
+        .instruction {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #3498db;
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+
+        .key-status {
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .question-result {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generator Bài Tập Tiếng Anh</h1>
+    
+    <div class="input-section">
+        <div class="input-group">
+            <label for="skill">Kỹ năng:</label>
+            <select id="skill">
+                <option value="grammar">Grammar</option>
+                <option value="reading">Reading</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="level">Trình độ:</label>
+            <select id="level">
+                <option value="beginner">Beginner</option>
+                <option value="pre-intermediate">Pre-Intermediate</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="upper-intermediate">Upper-Intermediate</option>
+                <option value="advanced">Advanced</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="topic">Chủ đề:</label>
+            <input type="text" id="topic" placeholder="Nhập chủ đề">
+        </div>
+
+        <button onclick="generateQuiz()">Tạo Bài Tập Mới</button>
+    </div>
+
+    <div id="loadingIndicator" class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>Đang tạo bài tập...</p>
+    </div>
+
+    <div id="keyStatus" class="key-status" style="display: none;">
+        <p>API Key đang sử dụng: <span id="currentKey"></span></p>
+    </div>
+
+    <div class="quiz-container" id="quizContainer" style="display: none;">
+        <div id="questions"></div>
+        <div style="margin-top: 20px; text-align: center;">
+            <button onclick="submitQuiz()">Nộp Bài</button>
+            <button onclick="resetQuiz()" style="background-color: #e74c3c;">Làm Lại</button>
+        </div>
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        let currentQuiz = {};
+        let userAnswers = {};
+
+        // Xử lý thay đổi skill
+        document.getElementById('skill').addEventListener('change', function() {
+            const topicInput = document.getElementById('topic');
+            topicInput.placeholder = this.value === 'grammar' 
+                ? 'Ví dụ: Simple Past, Past Perfect...' 
+                : 'Ví dụ: Travel, Environment...';
+            topicInput.value = ''; // Reset giá trị trong ô chủ đề
+        });
+
+        // Kích hoạt placeholder ban đầu
+        document.getElementById('skill').dispatchEvent(new Event('change'));
+
+        async function generateQuiz() {
+            const topic = document.getElementById('topic').value.trim();
+            if (!topic) {
+                alert("Vui lòng nhập chủ đề");
+                return;
+            }
+
+            // Reset giao diện
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('questions').innerHTML = '';
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('keyStatus').style.display = 'none';
+            
+            const skill = document.getElementById('skill').value;
+            const level = document.getElementById('level').value;
+
+            try {
+                const response = await fetch('/api/generate-quiz', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        skill,
+                        level,
+                        topic,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Lỗi khi tạo bài tập");
+                }
+
+                const data = await response.json();
+                currentQuiz = data.quiz;
+                userAnswers = {};
+                
+                // Display which key is being used
+                document.getElementById('currentKey').textContent = data.keyUsed;
+                document.getElementById('keyStatus').style.display = 'block';
+                
+                displayQuiz(currentQuiz);
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('quizContainer').style.display = 'block';
+            } catch (error) {
+                console.error("Error generating quiz:", error);
+                alert("Lỗi khi tạo bài tập. Vui lòng thử lại sau.");
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }
+        }
+
+        function displayQuiz(quizData) {
+            const container = document.getElementById('questions');
+            container.innerHTML = '';
+            
+            // Thêm hướng dẫn và đoạn văn
+            let instruction = document.createElement('p');
+            instruction.className = 'instruction';
+            instruction.textContent = quizData.skill === 'grammar' 
+                ? 'Choose the correct answer.' 
+                : 'Read this passage and answer:';
+            
+            container.appendChild(instruction);
+            
+            if (quizData.skill === 'reading' && quizData.passage) {
+                const passageDiv = document.createElement('div');
+                passageDiv.className = 'passage';
+                passageDiv.textContent = quizData.passage;
+                container.appendChild(passageDiv);
+            }
+
+            // Hiển thị các câu hỏi
+            quizData.questions.forEach((q, index) => {
+                const questionHTML = `
+                    <div class="question">
+                        <p><strong>Câu ${index + 1}:</strong> ${q.question}</p>
+                        ${Object.entries(q.options).map(([key, value]) => `
+                            <label>
+                                <input type="radio" name="q${index}" value="${key}" onchange="saveAnswer(${index}, '${key}')">
+                                ${key}. ${value}
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                container.innerHTML += questionHTML;
+            });
+        }
+
+        function saveAnswer(questionIndex, answer) {
+            userAnswers[questionIndex] = answer;
+        }
+
+        function submitQuiz() {
+            const results = [];
+            let score = 0;
+
+            currentQuiz.questions.forEach((q, index) => {
+                const userAnswer = userAnswers[index] || null;
+                const isCorrect = userAnswer === q.correctAnswer;
+
+                if (isCorrect) score++;
+                results.push({
+                    question: q.question,
+                    correctAnswer: q.correctAnswer,
+                    userAnswer: userAnswer,
+                    isCorrect: isCorrect
+                });
+            });
+
+            displayResults(results, score);
+        }
+
+        function displayResults(results, score) {
+            const resultDiv = document.getElementById('result');
+            let html = `<h3>Kết Quả: ${score}/${currentQuiz.questions.length}</h3>`;
+            
+            results.forEach((r, index) => {
+                html += `
+                    <div class="question-result">
+                        <p><strong>Câu ${index + 1}:</strong> ${r.question}</p>
+                        <p>Đáp án của bạn: ${r.userAnswer || 'Chưa chọn'} | 
+                           Đáp án đúng: ${r.correctAnswer}</p>
+                        <p>${r.isCorrect ? '✅ Đúng' : '❌ Sai'}</p>
+                    </div>
+                `;
+            });
+
+            resultDiv.innerHTML = html;
+            resultDiv.style.display = 'block';
+            
+            // Scroll to results
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            userAnswers = {};
+            document.getElementById('result').style.display = 'none';
+            
+            // Reset all radio buttons
+            const radioButtons = document.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(radio => {
+                radio.checked = false;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,114 +1,165 @@
 from flask import Flask, render_template, request, jsonify
-import requests
-import json
 import os
-from dotenv import load_dotenv
+import requests
+import re
 
-load_dotenv()
+app = Flask(__name__)
+app.secret_key = "quiz_generator_secret_key"
 
-app = Flask(__name__, 
-    static_folder='../static',
-    template_folder='../templates'
-)
-app.secret_key = os.urandom(24)
+# Counter to track API requests for alternating between keys
+request_counter = 0
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/generate-quiz', methods=['POST'])
+@app.route('/api/generate-quiz', methods=['POST'])
 def generate_quiz():
+    global request_counter
+    
     data = request.json
+    skill = data.get('skill')
     level = data.get('level')
     topic = data.get('topic')
-    api_key = data.get('apiKey')
     
-    if not all([level, topic, api_key]):
-        return jsonify({'error': 'Missing required parameters'}), 400
+    # Alternate between keys
+    key_to_use = "KEY1" if request_counter % 2 == 0 else "KEY2"
+    request_counter += 1
     
-    prompt = f"""
-    Create an English language quiz for {level} level English learners on the topic of "{topic}".
+    # Get the appropriate API key
+    api_key = os.environ.get(f"GEMINI_{key_to_use}")
     
-    The quiz should include:
-    1. A title for the quiz
-    2. A short reading passage (if appropriate for the topic)
-    3. 5 multiple-choice questions
+    if not api_key:
+        return jsonify({"error": f"API key {key_to_use} is not configured"}), 500
     
-    For each question, provide:
-    - The question text
-    - 4 possible answers (A, B, C, D)
-    - The correct answer
-    - A brief explanation for the correct answer (optional)
+    role_prompt = "Bạn là một giáo viên tiếng Anh có 15 năm kinh nghiệm giảng dạy và ra đề thi. Hãy tạo "
+    content_prompt = ""
     
-    Format your response as a JSON object with the following structure:
-    {{
-      "title": "Quiz Title",
-      "passage": "Reading passage text (if applicable, otherwise null)",
-      "questions": [
-        {{
-          "text": "Question 1 text",
-          "options": ["Option A", "Option B", "Option C", "Option D"],
-          "correctAnswer": "The correct option text",
-          "explanation": "Explanation for the correct answer (optional)"
-        }},
-        // more questions...
-      ]
-    }}
-    """
+    if skill == 'grammar':
+        content_prompt = f"{role_prompt}5 câu hỏi trắc nghiệm về ngữ pháp {topic} cho trình độ {level}.\n"
+        content_prompt += "Yêu cầu:\n"
+        content_prompt += "- Câu hỏi phải phản ánh đúng trình độ học viên\n"
+        content_prompt += "- Lựa chọn đáp án gây nhiễu tốt\n"
+        content_prompt += "- Định dạng:\n"
+        content_prompt += "Câu 1: [Nội dung]\n"
+        content_prompt += "A. [Option A]\n"
+        content_prompt += "B. [Option B]\n"
+        content_prompt += "C. [Option C]\n"
+        content_prompt += "D. [Option D]\n"
+        content_prompt += "Đáp án: [Chữ cái]"
+    else:
+        length_requirement = ""
+        if level == 'beginner':
+            length_requirement = "100-150 từ, từ vựng đơn giản"
+        elif level == 'pre-intermediate':
+            length_requirement = "150-250 từ, từ vựng cơ bản"
+        elif level == 'intermediate':
+            length_requirement = "250-350 từ, có một số từ phức tạp"
+        elif level == 'upper-intermediate':
+            length_requirement = "350-500 từ, cấu trúc đa dạng"
+        else:
+            length_requirement = "500-800 từ, sử dụng từ vựng học thuật"
+        
+        content_prompt = f"{role_prompt}một bài đọc hiểu về {topic} với các yêu cầu sau:\n"
+        content_prompt += f"- Độ dài: {length_requirement}\n"
+        content_prompt += "- Nội dung hấp dẫn, phù hợp trình độ\n"
+        content_prompt += "- Sau đoạn văn tạo 5 câu hỏi trắc nghiệm\n"
+        content_prompt += "- Định dạng:\n"
+        content_prompt += "[Nội dung đoạn văn]\n\n"
+        content_prompt += "Câu 1: [Nội dung]\n"
+        content_prompt += "A. [Option A]\n"
+        content_prompt += "B. [Option B]\n"
+        content_prompt += "C. [Option C]\n"
+        content_prompt += "D. [Option D]\n"
+        content_prompt += "Đáp án: [Chữ cái]"
     
     try:
         response = requests.post(
-            'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
-            headers={
-                'Content-Type': 'application/json',
-                'x-goog-api-key': api_key
-            },
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={api_key}",
             json={
-                'contents': [
+                "contents": [
                     {
-                        'parts': [
+                        "parts": [
                             {
-                                'text': prompt
+                                "text": content_prompt
                             }
                         ]
                     }
-                ],
-                'generationConfig': {
-                    'temperature': 0.7,
-                    'topK': 40,
-                    'topP': 0.95,
-                    'maxOutputTokens': 2048,
-                }
-            },
-            timeout=30
+                ]
+            }
         )
         
-        if not response.ok:
-            error_data = response.json()
-            error_message = error_data.get('error', {}).get('message', 'Unknown error occurred')
-            return jsonify({'error': f'Gemini API error: {error_message}'}), response.status_code
-        
+        response.raise_for_status()
         data = response.json()
-        text_content = data['candidates'][0]['content']['parts'][0]['text']
+        response_text = data['candidates'][0]['content']['parts'][0]['text']
         
-        import re
-        json_match = re.search(r'({[\s\S]*})', text_content)
+        # Parse the quiz data
+        quiz_data = parse_quiz_response(response_text, skill)
         
-        if not json_match:
-            return jsonify({'error': 'Failed to parse quiz data from Gemini response'}), 500
-        
-        try:
-            quiz_data = json.loads(json_match.group(1))
-            return jsonify(quiz_data)
-        except json.JSONDecodeError:
-            return jsonify({'error': 'Failed to parse quiz data from Gemini response'}), 500
-            
-    except requests.Timeout:
-        return jsonify({'error': 'Request timed out. Please try again.'}), 504
-    except requests.RequestException as e:
-        return jsonify({'error': f'Network error: {str(e)}'}), 500
+        return jsonify({
+            "quiz": quiz_data,
+            "keyUsed": key_to_use
+        })
+    
     except Exception as e:
-        return jsonify({'error': f'Unexpected error: {str(e)}'}), 500
+        print(f"Error generating quiz: {str(e)}")
+        return jsonify({"error": "Failed to generate quiz"}), 500
+
+def parse_quiz_response(text, skill):
+    # Clean up the response text
+    clean_text = re.sub(r'Tuyệt vời!.*?\n', '', text)
+    clean_text = re.sub(r'Dưới đây là.*?\n', '', clean_text)
+    clean_text = re.sub(r'\*\*.*?\*\*\n', '', clean_text)
+    
+    if skill == "reading":
+        passage_end = clean_text.find("Câu 1:")
+        passage = clean_text[:passage_end].strip() if passage_end != -1 else ""
+        questions = parse_questions(clean_text[passage_end:] if passage_end != -1 else clean_text)
+        return {
+            "skill": skill,
+            "passage": passage,
+            "questions": questions
+        }
+    
+    return {
+        "skill": skill,
+        "passage": None,
+        "questions": parse_questions(clean_text)
+    }
+
+def parse_questions(text):
+    questions = []
+    question_blocks = re.split(r'Câu \d+:', text)[1:]
+    
+    for block in question_blocks:
+        lines = [line.strip() for line in block.split('\n') if line.strip()]
+        if not lines:
+            continue
+            
+        question_text = lines[0]
+        options = {}
+        correct_answer = ""
+        
+        for line in lines[1:]:
+            if re.match(r'^[A-D]\.', line):
+                parts = line.split('. ', 1)
+                if len(parts) == 2:
+                    key, value = parts
+                    options[key[0]] = value.strip()
+            elif line.startswith("Đáp án:"):
+                parts = line.split(': ', 1)
+                if len(parts) == 2:
+                    correct_answer = parts[1].strip()
+        
+        if question_text:
+            questions.append({
+                "question": question_text,
+                "options": options,
+                "correctAnswer": correct_answer
+            })
+    
+    return questions
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 8000))
+    app.run(host='0.0.0.0', port=port)
