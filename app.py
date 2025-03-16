@@ -26,6 +26,13 @@ TOPIC_SUGGESTIONS = {
         "upper-intermediate": ["Psychology", "Economics", "Politics", "Literature", "Innovation"],
         "advanced": ["Philosophy", "Ethics", "Globalization", "Climate Change", "Artificial Intelligence"]
     }
+    "vocabulary": {
+        "beginner": ["Basic Adjectives (Colors, Sizes)", "Numbers and Time", "Family Members", "Everyday Objects", "Common Verbs (eat, go, see)"],
+        "pre-intermediate": ["Travel and Transportation", "Jobs and Occupations", "Feelings and Emotions", "Shopping and Money", "Food and Cooking"],
+        "intermediate": ["Phrasal Verbs (take off, give up)", "Collocations (make a decision, do homework)", "Work and Business", "Health and Fitness", "Describing People (appearance, personality)"],
+        "upper-intermediate": ["Idioms (hit the nail on the head)", "Academic Vocabulary (analyze, evaluate)", "Technology and Innovation", "Environment and Sustainability", "Relationships and Society"],
+        "advanced": ["Advanced Idioms (burn the midnight oil)", "Synonyms and Antonyms (e.g., happy vs. elated)", "Legal and Political Terms", "Scientific Vocabulary", "Cultural Expressions and Proverbs"]
+    }
 }
 
 @app.route('/')
