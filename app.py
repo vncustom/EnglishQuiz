@@ -71,7 +71,7 @@ def generate_quiz():
     content_prompt = ""
     
     if skill == 'grammar':
-        content_prompt = f"{role_prompt}5 câu hỏi trắc nghiệm về ngữ pháp {topic} cho trình độ {level}.\n"
+        content_prompt = f"{role_prompt}5 câu hỏi trắc nghiệm độc lập về ngữ pháp nội dung về {topic} cho trình độ {level}.\n"
         content_prompt += "Yêu cầu:\n"
         content_prompt += "- Câu hỏi phải phản ánh đúng trình độ học viên\n"
         content_prompt += "- Lựa chọn đáp án gây nhiễu tốt\n"
