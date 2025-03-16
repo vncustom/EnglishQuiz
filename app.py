@@ -120,11 +120,10 @@ def generate_quiz():
         else:
             length_requirement = "Chọn từ, cụm từ đồng nghĩa hoặc trái nghĩa trong đoạn 100-120 từ, từ vựng C1-C2, thành ngữ học thuật"
         
-        content_prompt = f"{role_prompt} 5 câu hỏi trắc nghiệm English (text only) về {topic} với các yêu cầu sau:\n"
-        content_prompt += f"- Độ dài: {length_requirement}\n"
+        content_prompt = f"{role_prompt} 5 câu hỏi trắc nghiệm English (text only) độc lập về {topic} với các yêu cầu sau:\n"
+        content_prompt += f"- Độ dài mỗi câu: {length_requirement}\n"
         content_prompt += "- Nội dung hấp dẫn, phù hợp trình độ\n"
         content_prompt += "- Định dạng:\n"
-        content_prompt += "[Passage]\n\n"
         content_prompt += "Câu 1: [Nội dung]\n"
         content_prompt += "A. [Option A]\n"
         content_prompt += "B. [Option B]\n"
