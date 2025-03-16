@@ -239,12 +239,16 @@
 
         // Xử lý thay đổi skill
         document.getElementById('skill').addEventListener('change', function() {
-            const topicInput = document.getElementById('topic');
-            topicInput.placeholder = this.value === 'grammar' 
-                ? 'Ví dụ: Simple Past, Past Perfect... (hoặc để trống)' 
-                : 'Ví dụ: Travel, Environment... (hoặc để trống)';
-            topicInput.value = ''; // Reset giá trị trong ô chủ đề
-        });
+    const topicInput = document.getElementById('topic');
+    if (this.value === 'grammar') {
+        topicInput.placeholder = 'Ví dụ: Simple Past, Past Perfect... (hoặc để trống)';
+    } else if (this.value === 'reading') {
+        topicInput.placeholder = 'Ví dụ: Travel, Environment... (hoặc để trống)';
+    } else if (this.value === 'vocabulary') {
+        topicInput.placeholder = 'Ví dụ: Color, Proverb... (hoặc để trống)';
+    }
+    topicInput.value = ''; // Reset giá trị trong ô chủ đề
+});
 
         // Kích hoạt placeholder ban đầu
         document.getElementById('skill').dispatchEvent(new Event('change'));
