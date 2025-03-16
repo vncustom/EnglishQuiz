@@ -2,31 +2,12 @@ from flask import Flask, render_template, request, jsonify
 import os
 import requests
 import re
-import random
 
 app = Flask(__name__)
 app.secret_key = "quiz_generator_secret_key"
 
 # Counter to track API requests for alternating between keys
 request_counter = 0
-
-# Topic suggestions based on skill and level
-TOPIC_SUGGESTIONS = {
-    "grammar": {
-        "beginner": ["Present Simple", "Present Continuous", "Articles", "Possessive Adjectives", "Prepositions of Place"],
-        "pre-intermediate": ["Past Simple", "Past Continuous", "Comparatives", "Superlatives", "Going to Future"],
-        "intermediate": ["Present Perfect", "Past Perfect", "Conditionals Type 1 & 2", "Passive Voice", "Reported Speech"],
-        "upper-intermediate": ["Future Perfect", "Future Continuous", "Conditionals Type 3", "Wish Clauses", "Modal Verbs"],
-        "advanced": ["Inversion", "Cleft Sentences", "Subjunctive", "Participle Clauses", "Advanced Conditionals"]
-    },
-    "reading": {
-        "beginner": ["Family", "Daily Routines", "Food", "Hobbies", "Weather"],
-        "pre-intermediate": ["Travel", "Health", "Education", "Technology", "Environment"],
-        "intermediate": ["Culture", "Social Media", "Work Life", "Global Issues", "Science"],
-        "upper-intermediate": ["Psychology", "Economics", "Politics", "Literature", "Innovation"],
-        "advanced": ["Philosophy", "Ethics", "Globalization", "Climate Change", "Artificial Intelligence"]
-    }
-}
 
 @app.route('/')
 def index():
@@ -39,16 +20,7 @@ def generate_quiz():
     data = request.json
     skill = data.get('skill')
     level = data.get('level')
-    topic = data.get('topic', '').strip()
-    
-    # If topic is empty or too short, select a random appropriate topic
-    if not topic or len(topic) < 3:
-        available_topics = TOPIC_SUGGESTIONS.get(skill, {}).get(level, [])
-        if available_topics:
-            topic = random.choice(available_topics)
-        else:
-            # Fallback topics if the skill/level combination is not found
-            topic = "General English" if skill == "reading" else "Basic Grammar"
+    topic = data.get('topic')
     
     # Alternate between keys
     key_to_use = "KEY1" if request_counter % 2 == 0 else "KEY2"
@@ -124,11 +96,9 @@ def generate_quiz():
         # Parse the quiz data
         quiz_data = parse_quiz_response(response_text, skill)
         
-        # Add the selected topic to the response
         return jsonify({
             "quiz": quiz_data,
-            "keyUsed": key_to_use,
-            "selectedTopic": topic
+            "keyUsed": key_to_use
         })
     
     except Exception as e:

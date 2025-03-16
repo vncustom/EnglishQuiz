@@ -148,16 +148,6 @@
             font-size: 14px;
         }
 
-        .topic-info {
-            background-color: #f0f8ff;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 14px;
-            border-left: 4px solid #3498db;
-        }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -168,13 +158,6 @@
             padding: 10px;
             border-radius: 8px;
             background-color: white;
-        }
-
-        .note {
-            font-size: 13px;
-            color: #7f8c8d;
-            margin-top: 5px;
-            font-style: italic;
         }
     </style>
 </head>
@@ -204,7 +187,6 @@
         <div class="input-group">
             <label for="topic">Chủ đề:</label>
             <input type="text" id="topic" placeholder="Nhập chủ đề">
-            <p class="note">Để trống nếu muốn hệ thống tự chọn chủ đề phù hợp</p>
         </div>
 
         <button onclick="generateQuiz()">Tạo Bài Tập Mới</button>
@@ -215,13 +197,9 @@
         <p>Đang tạo bài tập...</p>
     </div>
 
-    <div id="keyStatus" class="key-status" style="display: none;">
+   <div id="keyStatus" class="key-status" style="display: none;">
         <p>API Key đang sử dụng: <span id="currentKey"></span></p>
-    </div>
-
-    <div id="topicInfo" class="topic-info" style="display: none;">
-        <p>Chủ đề được chọn: <span id="selectedTopic" style="font-weight: bold;"></span></p>
-    </div>
+   </div>
 
     <div class="quiz-container" id="quizContainer" style="display: none;">
         <div id="questions"></div>
@@ -240,8 +218,8 @@
         document.getElementById('skill').addEventListener('change', function() {
             const topicInput = document.getElementById('topic');
             topicInput.placeholder = this.value === 'grammar' 
-                ? 'Ví dụ: Simple Past, Past Perfect... (hoặc để trống)' 
-                : 'Ví dụ: Travel, Environment... (hoặc để trống)';
+                ? 'Ví dụ: Simple Past, Past Perfect...' 
+                : 'Ví dụ: Travel, Environment...';
             topicInput.value = ''; // Reset giá trị trong ô chủ đề
         });
 
@@ -249,17 +227,21 @@
         document.getElementById('skill').dispatchEvent(new Event('change'));
 
         async function generateQuiz() {
+            const topic = document.getElementById('topic').value.trim();
+            if (!topic) {
+                alert("Vui lòng nhập chủ đề");
+                return;
+            }
+
             // Reset giao diện
             document.getElementById('quizContainer').style.display = 'none';
             document.getElementById('questions').innerHTML = '';
             document.getElementById('result').style.display = 'none';
             document.getElementById('loadingIndicator').style.display = 'block';
             document.getElementById('keyStatus').style.display = 'none';
-            document.getElementById('topicInfo').style.display = 'none';
             
             const skill = document.getElementById('skill').value;
             const level = document.getElementById('level').value;
-            const topic = document.getElementById('topic').value;
 
             try {
                 const response = await fetch('/api/generate-quiz', {
@@ -285,10 +267,6 @@
                 // Display which key is being used
                 document.getElementById('currentKey').textContent = data.keyUsed;
                 document.getElementById('keyStatus').style.display = 'block';
-                
-                // Display the selected topic
-                document.getElementById('selectedTopic').textContent = data.selectedTopic;
-                document.getElementById('topicInfo').style.display = 'block';
                 
                 displayQuiz(currentQuiz);
                 document.getElementById('loadingIndicator').style.display = 'none';
