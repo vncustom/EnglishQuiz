@@ -138,7 +138,7 @@
             display: inline-block;
             animation: spin 1s linear infinite;
         }
-<!--
+
         .key-status {
             background-color: white;
             padding: 10px;
@@ -157,7 +157,7 @@
             font-size: 14px;
             border-left: 4px solid #3498db;
         }
--->
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -214,7 +214,7 @@
         <div class="spinner"></div>
         <p>Đang tạo bài tập...</p>
     </div>
-<!--
+
     <div id="keyStatus" class="key-status" style="display: none;">
         <p>API Key đang sử dụng: <span id="currentKey"></span></p>
     </div>
@@ -222,7 +222,7 @@
     <div id="topicInfo" class="topic-info" style="display: none;">
         <p>Chủ đề được chọn: <span id="selectedTopic" style="font-weight: bold;"></span></p>
     </div>
--->
+
     <div class="quiz-container" id="quizContainer" style="display: none;">
         <div id="questions"></div>
         <div style="margin-top: 20px; text-align: center;">
@@ -254,8 +254,8 @@
             document.getElementById('questions').innerHTML = '';
             document.getElementById('result').style.display = 'none';
             document.getElementById('loadingIndicator').style.display = 'block';
-            document.getElementById('keyStatus').style.display = 'none';
-            document.getElementById('topicInfo').style.display = 'none';
+            //document.getElementById('keyStatus').style.display = 'none';
+            //document.getElementById('topicInfo').style.display = 'none';
             
             const skill = document.getElementById('skill').value;
             const level = document.getElementById('level').value;
@@ -283,12 +283,12 @@
                 userAnswers = {};
                 
                 // Display which key is being used
-                document.getElementById('currentKey').textContent = data.keyUsed;
-                document.getElementById('keyStatus').style.display = 'block';
+                //document.getElementById('currentKey').textContent = data.keyUsed;
+                //document.getElementById('keyStatus').style.display = 'block';
                 
                 // Display the selected topic
-                document.getElementById('selectedTopic').textContent = data.selectedTopic;
-                document.getElementById('topicInfo').style.display = 'block';
+                //document.getElementById('selectedTopic').textContent = data.selectedTopic;
+                //document.getElementById('topicInfo').style.display = 'block';
                 
                 displayQuiz(currentQuiz);
                 document.getElementById('loadingIndicator').style.display = 'none';
