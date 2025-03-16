@@ -93,7 +93,7 @@ def generate_quiz():
         content_prompt += "- Nội dung hấp dẫn, phù hợp trình độ\n"
         content_prompt += "- Sau đoạn văn tạo 5 câu hỏi trắc nghiệm\n"
         content_prompt += "- Định dạng:\n"
-        content_prompt += "[Nội dung đoạn văn]\n\n"
+        content_prompt += "[Passage]\n\n"
         content_prompt += "Câu 1: [Nội dung]\n"
         content_prompt += "A. [Option A]\n"
         content_prompt += "B. [Option B]\n"
