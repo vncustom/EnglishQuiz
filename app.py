@@ -114,11 +114,11 @@ def generate_quiz():
         elif level == 'pre-intermediate':
             length_requirement = "Chọn từ/cụm từ trong câu 10-15 từ, từ vựng A2, ngữ cảnh đơn giản"
         elif level == 'intermediate':
-            length_requirement = "Chọn từ trong đoạn 50-70 từ, từ vựng B1, có thành ngữ cơ bản"
+            length_requirement = "Chọn từ trong điền vào đoạn 50-70 từ, từ vựng B1, có thành ngữ cơ bản"
         elif level == 'upper-intermediate':
-            length_requirement = "Chọn từ/cụm từ trong đoạn 80-100 từ, từ vựng B2, ngữ cảnh phức tạp"
+            length_requirement = "Chọn từ, cụm từ điền vào đoạn 80-100 từ, từ vựng B2, ngữ cảnh phức tạp"
         else:
-            length_requirement = "Chọn từ, cụm từ đồng nghĩa hoặc trái nghĩa trong đoạn 100-120 từ, từ vựng C1-C2, thành ngữ học thuật"
+            length_requirement = "Chọn từ, cụm từ điền vào đoạn 100-120 từ, từ vựng C1-C2, thành ngữ ít dụng hoặc từ vựng học thuật"
         
         content_prompt = f"{role_prompt} 5 câu hỏi trắc nghiệm English (text only) độc lập về {topic} với các yêu cầu sau:\n"
         content_prompt += f"- Độ dài mỗi câu: {length_requirement}\n"
