@@ -75,18 +75,18 @@ def generate_quiz():
         content_prompt += "C. [Option C]\n"
         content_prompt += "D. [Option D]\n"
         content_prompt += "Đáp án: [Chữ cái]"
-    else:
+    elif skill == 'reading':
         length_requirement = ""
         if level == 'beginner':
             length_requirement = "100-150 từ, từ vựng đơn giản"
         elif level == 'pre-intermediate':
-            length_requirement = "150-250 từ, từ vựng cơ bản"
+            length_requirement = "150-250 từ, từ vựng A2, câu có cấu trúc đơn giản, một số liên từ cơ bản"
         elif level == 'intermediate':
-            length_requirement = "250-350 từ, có một số từ phức tạp"
+            length_requirement = "250-350 từ, từ vựng B1, bao gồm một số cụm từ thông dụng và câu ghép"
         elif level == 'upper-intermediate':
-            length_requirement = "350-500 từ, cấu trúc đa dạng"
+            length_requirement = "350-500 từ, từ vựng B2, cấu trúc đa dạng, có yếu tố suy luận"
         else:
-            length_requirement = "500-800 từ, sử dụng từ vựng học thuật"
+            length_requirement = "500-800 từ, từ vựng C1-C2, câu phức tạp, chủ đề trừu tượng hoặc học thuật"
         
         content_prompt = f"{role_prompt}một bài đọc hiểu về {topic} với các yêu cầu sau:\n"
         content_prompt += f"- Độ dài: {length_requirement}\n"
@@ -100,7 +100,29 @@ def generate_quiz():
         content_prompt += "C. [Option C]\n"
         content_prompt += "D. [Option D]\n"
         content_prompt += "Đáp án: [Chữ cái]"
-    
+    else:
+        length_requirement = ""
+        if level == 'beginner':
+            length_requirement = "Hoàn thành câu ngắn, từ vựng A1, ngữ cảnh quen thuộc"
+        elif level == 'pre-intermediate':
+            length_requirement = "Chọn từ/cụm từ trong câu 10-15 từ, từ vựng A2, ngữ cảnh đơn giản"
+        elif level == 'intermediate':
+            length_requirement = "Chọn từ trong đoạn 50-70 từ, từ vựng B1, có thành ngữ cơ bản"
+        elif level == 'upper-intermediate':
+            length_requirement = "Chọn từ/cụm từ trong đoạn 80-100 từ, từ vựng B2, ngữ cảnh phức tạp"
+        else:
+            length_requirement = "Chọn từ, cụm từ đồng nghĩa hoặc trái nghĩa trong đoạn 100-120 từ, từ vựng C1-C2, thành ngữ học thuật"
+        
+        content_prompt = f"{role_prompt} 5 câu hỏi trắc nghiệm về {topic} với các yêu cầu sau:\n"
+        content_prompt += f"- Hình thức câu hỏi: {length_requirement}\n"
+        content_prompt += "- Nội dung hấp dẫn, phù hợp trình độ\n"
+        content_prompt += "- Định dạng:\n"
+        content_prompt += "Câu 1: [Nội dung]\n"
+        content_prompt += "A. [Option A]\n"
+        content_prompt += "B. [Option B]\n"
+        content_prompt += "C. [Option C]\n"
+        content_prompt += "D. [Option D]\n"
+        content_prompt += "Đáp án: [Chữ cái]"
     try:
         response = requests.post(
             f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={api_key}",
