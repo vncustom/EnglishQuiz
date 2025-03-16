@@ -110,7 +110,7 @@ def generate_quiz():
     else:
         length_requirement = ""
         if level == 'beginner':
-            length_requirement = "Hoàn thành câu ngắn, từ vựng A1, ngữ cảnh quen thuộc"
+            length_requirement = "Hoàn thành câu ngắn 5-10 từ, từ vựng A1, ngữ cảnh quen thuộc"
         elif level == 'pre-intermediate':
             length_requirement = "Chọn từ/cụm từ trong câu 10-15 từ, từ vựng A2, ngữ cảnh đơn giản"
         elif level == 'intermediate':
@@ -121,7 +121,7 @@ def generate_quiz():
             length_requirement = "Chọn từ, cụm từ đồng nghĩa hoặc trái nghĩa trong đoạn 100-120 từ, từ vựng C1-C2, thành ngữ học thuật"
         
         content_prompt = f"{role_prompt} 5 câu hỏi trắc nghiệm English (text only) về {topic} với các yêu cầu sau:\n"
-        content_prompt += f"- Hình thức câu hỏi: {length_requirement}\n"
+        content_prompt += f"- Độ dài: {length_requirement}\n"
         content_prompt += "- Nội dung hấp dẫn, phù hợp trình độ\n"
         content_prompt += "- Định dạng:\n"
         content_prompt += "[Passage]\n\n"
