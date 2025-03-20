@@ -25,6 +25,13 @@ TOPIC_SUGGESTIONS = {
         "intermediate": ["Culture", "Social Media", "Work Life", "Global Issues", "Science"],
         "upper-intermediate": ["Psychology", "Economics", "Politics", "Literature", "Innovation"],
         "advanced": ["Philosophy", "Ethics", "Globalization", "Climate Change", "Artificial Intelligence"]
+    },
+    "vocabulary": {
+        "beginner": ["Basic Adjectives (Colors, Sizes)", "Numbers and Time", "Family Members", "Everyday Objects", "Common Verbs (eat, go, see)"],
+        "pre-intermediate": ["Travel and Transportation", "Jobs and Occupations", "Feelings and Emotions", "Shopping and Money", "Food and Cooking"],
+        "intermediate": ["Phrasal Verbs (take off, give up)", "Collocations (make a decision, do homework)", "Work and Business", "Health and Fitness", "Describing People (appearance, personality)"],
+        "upper-intermediate": ["Idioms (hit the nail on the head)", "Academic Vocabulary (analyze, evaluate)", "Technology and Innovation", "Environment and Sustainability", "Relationships and Society"],
+        "advanced": ["Advanced Idioms (burn the midnight oil)", "Synonyms and Antonyms (e.g., happy vs. elated)", "Legal and Political Terms", "Scientific Vocabulary", "Cultural Expressions and Proverbs"]
     }
 }
 
@@ -64,7 +71,7 @@ def generate_quiz():
     content_prompt = ""
     
     if skill == 'grammar':
-        content_prompt = f"{role_prompt}5 câu hỏi trắc nghiệm về ngữ pháp {topic} cho trình độ {level}.\n"
+        content_prompt = f"{role_prompt}5 câu hỏi trắc nghiệm độc lập về ngữ pháp nội dung về {topic} cho trình độ {level}.\n"
         content_prompt += "Yêu cầu:\n"
         content_prompt += "- Câu hỏi phải phản ánh đúng trình độ học viên\n"
         content_prompt += "- Lựa chọn đáp án gây nhiễu tốt\n"
@@ -75,18 +82,18 @@ def generate_quiz():
         content_prompt += "C. [Option C]\n"
         content_prompt += "D. [Option D]\n"
         content_prompt += "Đáp án: [Chữ cái]"
-    else:
+    elif skill == 'reading':
         length_requirement = ""
         if level == 'beginner':
             length_requirement = "100-150 từ, từ vựng đơn giản"
         elif level == 'pre-intermediate':
-            length_requirement = "150-250 từ, từ vựng cơ bản"
+            length_requirement = "150-250 từ, từ vựng A2, câu có cấu trúc đơn giản, một số liên từ cơ bản"
         elif level == 'intermediate':
-            length_requirement = "250-350 từ, có một số từ phức tạp"
+            length_requirement = "250-350 từ, từ vựng B1, bao gồm một số cụm từ thông dụng và câu ghép"
         elif level == 'upper-intermediate':
-            length_requirement = "350-500 từ, cấu trúc đa dạng"
+            length_requirement = "350-500 từ, từ vựng B2, cấu trúc đa dạng, có yếu tố suy luận"
         else:
-            length_requirement = "500-800 từ, sử dụng từ vựng học thuật"
+            length_requirement = "500-800 từ, từ vựng C1-C2, câu phức tạp, chủ đề trừu tượng hoặc học thuật"
         
         content_prompt = f"{role_prompt}một bài đọc hiểu về {topic} với các yêu cầu sau:\n"
         content_prompt += f"- Độ dài: {length_requirement}\n"
@@ -100,7 +107,29 @@ def generate_quiz():
         content_prompt += "C. [Option C]\n"
         content_prompt += "D. [Option D]\n"
         content_prompt += "Đáp án: [Chữ cái]"
-    
+    else:
+        length_requirement = ""
+        if level == 'beginner':
+            length_requirement = "Hoàn thành câu ngắn 5-10 từ, từ vựng A1, ngữ cảnh quen thuộc"
+        elif level == 'pre-intermediate':
+            length_requirement = "Chọn từ/cụm từ trong câu 10-15 từ, từ vựng A2, ngữ cảnh đơn giản"
+        elif level == 'intermediate':
+            length_requirement = "Chọn từ trong điền vào đoạn 50-70 từ, từ vựng B1, có thành ngữ cơ bản"
+        elif level == 'upper-intermediate':
+            length_requirement = "Chọn từ, cụm từ điền vào đoạn 80-100 từ, từ vựng B2, ngữ cảnh phức tạp"
+        else:
+            length_requirement = "Chọn từ, cụm từ điền vào đoạn 100-120 từ, từ vựng C1-C2, thành ngữ ít dụng hoặc từ vựng học thuật"
+        
+        content_prompt = f"{role_prompt} 5 câu hỏi trắc nghiệm English (text only) độc lập về {topic} với các yêu cầu sau:\n"
+        content_prompt += f"- Độ dài mỗi câu: {length_requirement}\n"
+        content_prompt += "- Nội dung hấp dẫn, phù hợp trình độ\n"
+        content_prompt += "- Định dạng:\n"
+        content_prompt += "Câu 1: [Nội dung]\n"
+        content_prompt += "A. [Option A]\n"
+        content_prompt += "B. [Option B]\n"
+        content_prompt += "C. [Option C]\n"
+        content_prompt += "D. [Option D]\n"
+        content_prompt += "Đáp án: [Chữ cái]"
     try:
         response = requests.post(
             f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={api_key}",
